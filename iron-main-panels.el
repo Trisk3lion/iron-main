@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'widget)
+(require 'iron-main-utils)
 
 (eval-when-compile
   (require 'wid-edit))
