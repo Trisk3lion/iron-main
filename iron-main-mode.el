@@ -79,9 +79,8 @@ that IBM release in the public domain."
 
 (define-minor-mode iron-main-mode
   "A minor mode to edit files and interact with IBM MVS or z/OS."
-  nil
-  "//IRON-MAIN"
-
+  :init-value nil
+  :lighter "//IRON-MAIN"
   :group 'iron-main
   :keymap (let ((km (make-sparse-keymap)))
 	    (set-keymap-parent km prog-mode-map) ; Inherit from prog-mode-map!
