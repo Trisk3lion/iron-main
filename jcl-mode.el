@@ -179,6 +179,20 @@ Anything after the 'operands' in a card is a comment; this regexp
 selects them in case of 'continuation' cards that do not have the
 'name' and 'operation'.")
 
+;;; CC Specific
+
+(defcustom jcl-cc-envs
+  '("PROD" "PRODHOLD" "IK" "IKDHOLD" "SYSTEST" "PROJ")
+  "CC Environments.")
+
+(defvar jcl-cc-when
+  "^))\\(WHEN\\|ELSE\\|END\\)"
+  "JCL names.
+
+These are the 'names' of jobs and steps.")
+
+(defconst jcl-cc-when-envs
+  (regexp-opt jcl-cc-envs "^))WHEN\\s-+.*\\("))
 
 ;;; JCL faces.
 
@@ -224,6 +238,10 @@ selects them in case of 'continuation' cards that do not have the
     (,jcl-strings . ,jcl-string-face)
 
     (,jcl-names . (1 ,jcl-names-face))
+
+    (,jcl-cc-when . ,jcl-operands-face)
+
+    (,jcl-cc-when-envs . (1 ,jcl-operations-face))
 
     (,(regexp-opt jcl-operations 'words) . ,jcl-operations-face)
 
@@ -297,10 +315,10 @@ selects them in case of 'continuation' cards that do not have the
   (face-remap-add-relative jcl-operations-face  :weight 'bold)
 
   ;; Comments.
-  ;; (setq-local comment-start "//\\*")
-  ;; (setq-local comment-end "")
-  ;; (setq-local comment-start-skip
-  ;;             "^//[[:graph:]]*[[:blank:]]+[[:graph:]]+[[:blank:]]+")
+  (setq-local comment-start "//\\*")
+  (setq-local comment-end "")
+  (setq-local comment-start-skip
+              "^//\\*\\s-*")
 
   ;; Set up the mode keymap.
 
@@ -331,12 +349,20 @@ selects them in case of 'continuation' cards that do not have the
 ;;;; Commands
 ;;;; ========
 
+(defun jcl-comment-current-line ()
+  "Add '*' in the third column."
+  (interactive)
+  (move-to-column 2)
+  (delete-char 1)
+  (insert "*")
+  )
+
 (defun jcl-submit (&optional port)
   "Submits the buffer's content to the 'card reader' at PORT.
 
-The buffer contains 'JCL cards' (i.e., lines) which are submitted to a
-'card reader'  listening on PORT.  PORT is an integer; its default is
-3505."
+  The buffer contains 'JCL cards' (i.e., lines) which are submitted to a
+  'card reader'  listening on PORT.  PORT is an integer; its default is
+  3505."
   
   (interactive
    (let ((p (read-number "JCL: card reader number/port: " 3505))
@@ -370,10 +396,10 @@ The buffer contains 'JCL cards' (i.e., lines) which are submitted to a
 (defun jcl-submit-file (jcl-file &optional port)
   "Submits the file JCL-FILE to the 'card reader' at PORT.
 
-The file JCL-FILE contains 'JCL cards' (i.e., lines) which are
-submitted to a 'card reader' listening on PORT.  PORT is an
-integer; its default is 3505."
-    
+  The file JCL-FILE contains 'JCL cards' (i.e., lines) which are
+  submitted to a 'card reader' listening on PORT.  PORT is an
+  integer; its default is 3505."
+
   (interactive
    (let ((f (read-file-name "JCL: card file: " nil nil 'confirm))
 	 (p (read-number "JCL: card reader number/port: " 3505))
@@ -382,7 +408,7 @@ integer; its default is 3505."
 
   (unless port
     (setq port 3505))
-    
+
   (message "JCL: submitting '%s' to card reader number/port %s."
 	   jcl-file port)
   (let ((card-reader-stream
@@ -401,11 +427,15 @@ integer; its default is 3505."
 	  )
       (delete-process card-reader-stream))
     )
-)
+  )
 
 
 ;;;; Epilogue
 ;;;; ========
+
+;; Inspiration:
+;;  - https://github.com/lsiksous/jcl-mode.el/blob/master/jcl-mode.el
+;;  - https://within-parens.blogspot.com/2020/12/iron-handling-with-emacs-lisp.html
 
 (add-to-list 'auto-mode-alist '("\\.jcl\\'" . jcl-mode))
 
