@@ -97,11 +97,47 @@ that IBM release in the public domain."
   :group 'jcl
   :type 'string)
 
+(defcustom jcl-proc-member-library
+  '("c:/WS/Zmap/LSDE/Asc/0Tut1/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/1Gem0/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/2Proj0/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/4Proj/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/5IKhold/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/6IK/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/7Prodhold/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/8Prod/All/Cobincl/"
+    "c:/WS/Zmap/LSDE/Asc/0Tut1/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/1Gem0/all/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/2Proj0/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/4Proj0/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/5IKhold/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/6IK/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/7Prodhold/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/8Prod/All/Cobcopy/"
+    "c:/WS/Zmap/LSDE/Asc/0Tut1/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/1Gem0/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/2Proj0/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/4Proj/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/5IKhold/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/6IK/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/7Prodhold/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/8Prod/All/edinclib/"
+    "c:/WS/Zmap/LSDE/Asc/8Prod/All/SYS1.SCSQCOBC/"
+    "c:/WS/Zmap/LSDE/Asc/8Prod/All/SYS1.SCEESAMP/"
+    )
+  "Path to Procedurs and Members."
+  :group 'kh-cbl
+  :type '(string))
+
+(defcustom jcl-proc-mem-suffix
+  '(".proc" ".jcl")
+  "File name suffixes for procedures and members."
+  :type '(string))
+
 
 ;;; Things to highlight.
 
 ;;; jcl-constants
-;;; UNUSED.
 
 (defvar jcl-constants
   '("//" "/*" "//*")
@@ -179,10 +215,18 @@ Anything after the 'operands' in a card is a comment; this regexp
 selects them in case of 'continuation' cards that do not have the
 'name' and 'operation'.")
 
+;;; JCL Regexps
+
+(defconst jcl-proc-regexp "^//.*EXEC\\s-+\\([^\\(PGM\\)]\\w+\\)")
+
+(defconst jcl-pgm-regexp "^//.*EXEC\\s-+PGM=\\(\\w+\\)")
+
+(defconst jcl-include-regexp "^//.*INCLUDE\\s-+MEMBER=\\(\\w+\\)")
+
 ;;; CC Specific
 
 (defcustom jcl-cc-envs
-  '("PROD" "PRODHOLD" "IK" "IKDHOLD" "SYSTEST" "PROJ")
+  '("PROD" "PRODHOLD" "IK" "IKDHOLD" "PROJ")
   "CC Environments.")
 
 (defvar jcl-cc-when
@@ -249,6 +293,12 @@ These are the 'names' of jobs and steps.")
 
     (,(regexp-opt jcl-operators nil) . ,jcl-operators-face)
 
+    (,jcl-proc-regexp (1 '(face nil mouse-face link)))
+
+    (,jcl-pgm-regexp (1 '(face nil mouse-face link)))
+
+    (,jcl-include-regexp (1 '(face nil mouse-face link)))
+
     ;;These must be last.
     (,jcl-card-end-comments-1 . (1 ,jcl-comment-face))
     (,jcl-card-end-comments-2 . (1 ,jcl-comment-face))
@@ -265,6 +315,10 @@ These are the 'names' of jobs and steps.")
   "The JCL mode 'font-lock' defaults specification."
   )
 
+;;; Utility FUNCTION
+
+(defun jcl-locate-proc-mem (name)
+  (locate-file name jcl-proc-member-library jcl-proc-mem-suffix))
 
 ;;; jcl-mode-syntax-table
 
