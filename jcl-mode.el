@@ -314,11 +314,15 @@ These are the 'names' of jobs and steps.")
 			   :foreground "Forest Green") ; This may be too much.
   (face-remap-add-relative jcl-operations-face  :weight 'bold)
 
+  (setq-local fill-column 72)
+
   ;; Comments.
-  (setq-local comment-start "//\\*")
-  (setq-local comment-end "")
-  (setq-local comment-start-skip
-              "^//\\*\\s-*")
+  (setq-local comment-start "//*"
+              comment-end ""
+              comment-start-skip
+              "^//\\*\\s-*"
+              comment-column 40
+              comment-use-syntax nil)
 
   ;; Set up the mode keymap.
 
