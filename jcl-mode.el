@@ -198,6 +198,10 @@ These are the 'names' of jobs and steps.")
   "^//\\*.*$"
   "JCL 'full card' comments.")
 
+(defvar jcl-expanded
+  "^XX.*"
+  "Lines with expanded INCLUDE's.")
+
 
 (defvar jcl-card-end-comments-1
   "^//[^* ]+ +[[:graph:]]* +[[:graph:]]+ +\\([[:graph:]].*\\)"
@@ -276,6 +280,11 @@ These are the 'names' of jobs and steps.")
   :type 'symbol
   )
 
+(defcustom jcl-expanded-face 'font-lock-warning-face
+  "The face used to fontify expanded INCLUDE's in `jcl-mode'."
+  :group 'jcl
+  :type 'symbol)
+
 
 (defvar jcl-font-lock-keywords
   `(
@@ -298,6 +307,8 @@ These are the 'names' of jobs and steps.")
     (,jcl-pgm-regexp (1 '(face nil mouse-face link)))
 
     (,jcl-include-regexp (1 '(face nil mouse-face link)))
+
+    (,jcl-expanded . (0 ,jcl-expanded-face t))
 
     ;;These must be last.
     (,jcl-card-end-comments-1 . (1 ,jcl-comment-face))
