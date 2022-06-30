@@ -221,7 +221,7 @@ selects them in case of 'continuation' cards that do not have the
 
 ;;; JCL Regexps
 
-(defconst jcl-proc-regexp "^//.*EXEC\\s-+\\([^\\(PGM\\)]\\w+\\)")
+(defconst jcl-proc-regexp "^//.*EXEC\\s-+\\([^\\(PGM\\)]\\w+\\),?")
 
 (defconst jcl-pgm-regexp "^//.*EXEC\\s-+PGM=\\(\\w+\\)")
 
@@ -426,21 +426,37 @@ These are the 'names' of jobs and steps.")
   (insert "*")
   )
 
+
+(defun jcl--electric-enter ()
+  (newline)
+  (insert "//"))
+
+(defun jcl-electric-enter ()
+  (interactive)
+  (cond
+   ((eq (char-before) ?,)
+    (jcl--electric-enter))
+   ((looking-back "\\s-+," (point-at-bol))
+    (jcl--electric-enter))
+   (t (newline))))
+
+(define-key jcl-mode-map (kbd "RET") #'jcl-electric-enter)
+
 (defun jcl-submit (&optional port)
   "Submits the buffer's content to the 'card reader' at PORT.
 
   The buffer contains 'JCL cards' (i.e., lines) which are submitted to a
   'card reader'  listening on PORT.  PORT is an integer; its default is
   3505."
-  
+
   (interactive
    (let ((p (read-number "JCL: card reader number/port: " 3505))
 	 )
      (list p)))
-  
+
   (unless port
     (setq port 3505))
-  
+
   (message "JCL: submitting to card reader number/port %s." port)
 
   (let ((card-reader-stream
